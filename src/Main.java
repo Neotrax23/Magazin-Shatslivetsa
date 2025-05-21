@@ -218,4 +218,107 @@ public class StoreManagementSystem {
             System.out.printf("%-5d %-20s %-15.2f%n", c.getId(), c.getName(), c.getMonthlySalary());
         }
     }
+    private static void processSale() {
+        System.out.println("\n=== Process Sale ===");
+
+        List<Cashier> cashiers = store.getCashiers();
+        if (cashiers.isEmpty()) {
+            System.out.println("No cashiers available. Please add cashiers first.");
+            return;
+        }
+
+        System.out.println("Available Cashiers:");
+        for (int i = 0; i < cashiers.size(); i++) {
+            System.out.printf("%d. %s%n", i+1, cashiers.get(i).getName());
+        }
+
+        int cashierIndex;
+        while (true) {
+            cashierIndex = getValidIntInput("Select cashier (1-" + cashiers.size() + "): ") - 1;
+            if (cashierIndex >= 0 && cashierIndex < cashiers.size()) {
+                break;
+            }
+            System.out.println("Invalid selection. Please try again.");
+        }
+
+        Cashier selectedCashier = cashiers.get(cashierIndex);
+        Receipt receipt = store.createReceipt(selectedCashier);
+
+        while (true) {
+            System.out.println("\nCurrent Receipt Total: $" + receipt.getTotalAmount());
+            System.out.println("1. Add Product");
+            System.out.println("2. Finish Sale");
+
+            int choice = getValidIntInput("Select option: ");
+
+            if (choice == 2) break;
+
+            viewProducts();
+            int productId = getValidIntInput("Enter product ID to add: ");
+
+            int quantity = getValidIntInput("Enter quantity: ");
+
+            Product selectedProduct = null;
+            for (Product p : store.getInventory()) {
+                if (p.getId() == productId) {
+                    selectedProduct = p;
+                    break;
+                }
+            }
+
+            if (selectedProduct == null) {
+                System.out.println("Product not found!");
+                continue;
+            }
+
+            try {
+                receipt.addProduct(selectedProduct, quantity, store);
+                System.out.printf("Added %d x %s to receipt%n", quantity, selectedProduct.getName());
+            } catch (InsufficientQuantityException e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+        }
+
+        System.out.println("\n=== Receipt Summary ===");
+        System.out.println("Receipt #" + receipt.getReceiptNumber());
+        System.out.println("Cashier: " + receipt.getCashier().getName());
+        System.out.println("Date: " + receipt.getDateTime());
+
+        System.out.println("\nItems Purchased:");
+        System.out.printf("%-20s %-10s %-10s %-10s%n", "Product", "Price", "Qty", "Subtotal");
+        for (Map.Entry<Product, Integer> entry : receipt.getProducts().entrySet()) {
+            Product p = entry.getKey();
+            int qty = entry.getValue();
+            double price = p.calculateSellingPrice(store);
+            System.out.printf("%-20s %-10.2f %-10d %-10.2f%n",
+                    p.getName(), price, qty, price * qty);
+        }
+
+        System.out.println("\nTotal Amount: $" + receipt.getTotalAmount());
+        saveReceiptToFile(receipt);
+    }
+
+    private static void saveReceiptToFile(Receipt receipt) {
+        String filename = "receipt_" + receipt.getReceiptNumber() + ".txt";
+        try (PrintWriter writer = new PrintWriter(filename)) {
+            writer.println("=== Receipt ===");
+            writer.println("Number: " + receipt.getReceiptNumber());
+            writer.println("Cashier: " + receipt.getCashier().getName());
+            writer.println("Date: " + receipt.getDateTime());
+
+            writer.println("\nItems:");
+            for (Map.Entry<Product, Integer> entry : receipt.getProducts().entrySet()) {
+                Product p = entry.getKey();
+                int qty = entry.getValue();
+                double price = p.calculateSellingPrice(store);
+                writer.printf("%s - %.2f x %d = %.2f%n",
+                        p.getName(), price, qty, price * qty);
+            }
+
+            writer.println("\nTotal: " + receipt.getTotalAmount());
+            System.out.println("Receipt saved to " + filename);
+        } catch (FileNotFoundException e) {
+            System.out.println("Error saving receipt: " + e.getMessage());
+        }
+    }
 }
