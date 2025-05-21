@@ -321,4 +321,21 @@ public class StoreManagementSystem {
             System.out.println("Error saving receipt: " + e.getMessage());
         }
     }
+    private static void viewStatistics() {
+        System.out.println("\n=== Store Statistics ===");
+        System.out.printf("Total Revenue: $%.2f%n", store.calculateTotalRevenue());
+        System.out.printf("Total Expenses: $%.2f%n", store.calculateTotalExpenses());
+        System.out.printf("Profit: $%.2f%n", store.calculateProfit());
+
+        System.out.println("\nInventory Value:");
+        double totalInventoryValue = 0;
+        for (Product p : store.getInventory()) {
+            double value = p.getDeliveryPrice() * p.getQuantity();
+            System.out.printf("%s: $%.2f%n", p.getName(), value);
+            totalInventoryValue += value;
+        }
+        System.out.printf("Total Inventory Value: $%.2f%n", totalInventoryValue);
+
+        System.out.println("\nTotal Receipts Issued: " + Receipt.getTotalReceipts());
+    }
 }
