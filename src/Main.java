@@ -167,4 +167,28 @@ public class StoreManagementSystem {
         }
 
     }
+    private static void manageCashiers() {
+        while (true) {
+            System.out.println("\n=== Cashier Management ===");
+            System.out.println("1. Add Cashier");
+            System.out.println("2. View Cashiers");
+            System.out.println("3. Back to Main Menu");
+
+            int choice = getValidIntInput("Select option: ");
+
+            switch (choice) {
+                case 1:
+                    addCashier();
+                    break;
+                case 2:
+                    viewCashiers();
+                    break;
+                case 3:
+                    return;
+                default:
+                    System.out.println("Invalid option. Please try again.");
+            }
+        }
+    }
+
 }
