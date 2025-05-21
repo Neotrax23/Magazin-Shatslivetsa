@@ -76,4 +76,27 @@ public class StoreManagementSystem {
             }
         }
     }
+    private static void manageProducts() {
+        while (true) {
+            System.out.println("\n=== Product Management ===");
+            System.out.println("1. Add Product");
+            System.out.println("2. View Products");
+            System.out.println("3. Back to Main Menu");
+
+            int choice = getValidIntInput("Select option: ");
+
+            switch (choice) {
+                case 1:
+                    addProduct();
+                    break;
+                case 2:
+                    viewProducts();
+                    break;
+                case 3:
+                    return;
+                default:
+                    System.out.println("Invalid option. Please try again.");
+            }
+        }
+    }
 }
