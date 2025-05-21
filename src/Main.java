@@ -190,5 +190,18 @@ public class StoreManagementSystem {
             }
         }
     }
+    private static void addCashier() {
+        System.out.println("\n=== Add New Cashier ===");
 
+        int id = getValidIntInput("Enter cashier ID: ");
+
+        System.out.print("Enter cashier name: ");
+        String name = scanner.nextLine();
+
+        double salary = getValidDoubleInput("Enter monthly salary: ");
+
+        Cashier cashier = new Cashier(id, name, salary);
+        store.addCashier(cashier);
+        System.out.println("Cashier added successfully!");
+    }
 }
