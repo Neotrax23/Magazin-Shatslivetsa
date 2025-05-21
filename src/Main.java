@@ -99,4 +99,39 @@ public class StoreManagementSystem {
             }
         }
     }
+    private static void addProduct() {
+        System.out.println("\n=== Add New Product ===");
+
+        int id = getValidIntInput("Enter product ID: ");
+
+        System.out.print("Enter product name: ");
+        String name = scanner.nextLine();
+
+        double price = getValidDoubleInput("Enter delivery price: ");
+
+        int quantity = getValidIntInput("Enter quantity: ");
+
+        String isFood;
+        while (true) {
+            System.out.print("Is this a food product? (y/n): ");
+            isFood = scanner.nextLine().trim().toLowerCase();
+            if (isFood.equals("y") || isFood.equals("n")) {
+                break;
+            }
+            System.out.println("Invalid input. Please enter 'y' or 'n'.");
+        }
+
+        Product product;
+        if (isFood.equals("y")) {
+            // Only ask for expiration date if it's a food product
+            LocalDate expirationDate = getValidDateInput("Enter expiration date (YYYY-MM-DD): ");
+            product = new FoodProduct(id, name, price, expirationDate, quantity);
+        } else {
+            // For non-food products, set a default expiration date far in the future
+            product = new NonFoodProduct(id, name, price, LocalDate.now().plusYears(10), quantity);
+        }
+
+        store.addProduct(product);
+        System.out.println("Product added successfully!");
+    }
 }
