@@ -14,4 +14,52 @@ public abstract class Product {
         this.expirationDate = expirationDate;
         this.quantity = quantity;
     }
+    public abstract double calculateSellingPrice(Store store);
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public double getDeliveryPrice() {
+        return deliveryPrice;
+    }
+
+    public void setDeliveryPrice(double deliveryPrice) {
+        this.deliveryPrice = deliveryPrice;
+    }
+
+    public LocalDate getExpirationDate() {
+        return expirationDate;
+    }
+
+    public void setExpirationDate(LocalDate expirationDate) {
+        this.expirationDate = expirationDate;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    public boolean isExpired() {
+        return LocalDate.now().isAfter(expirationDate);
+    }
+
+    public boolean isAboutToExpire(Store store) {
+        return LocalDate.now().plusDays(store.getDaysBeforeExpiration()).isAfter(expirationDate);
+    }
 }
