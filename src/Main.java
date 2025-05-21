@@ -134,4 +134,14 @@ public class StoreManagementSystem {
         store.addProduct(product);
         System.out.println("Product added successfully!");
     }
+    private static LocalDate getValidDateInput(String prompt) {
+        while (true) {
+            System.out.print(prompt);
+            try {
+                return LocalDate.parse(scanner.nextLine());
+            } catch (Exception e) {
+                System.out.println("Invalid date format. Please use YYYY-MM-DD format.");
+            }
+        }
+    }
 }
