@@ -144,4 +144,27 @@ public class StoreManagementSystem {
             }
         }
     }
+    private static void viewProducts() {
+        System.out.println("\n=== Product Inventory ===");
+        List<Product> products = store.getInventory();
+
+        if (products.isEmpty()) {
+            System.out.println("No products available.");
+            return;
+        }
+
+        System.out.printf("%-5s %-20s %-10s %-15s %-10s %-15s %-10s%n",
+                "ID", "Name", "Type", "Delivery Price", "Quantity", "Expiration", "Selling Price");
+
+        for (Product p : products) {
+            String type = (p instanceof FoodProduct) ? "Food" : "Non-Food";
+            String expirationDisplay = (p instanceof FoodProduct) ? p.getExpirationDate().toString() : "Non applicable";
+            String expired = (p instanceof FoodProduct && p.isExpired()) ? " (EXPIRED)" : "";
+
+            System.out.printf("%-5d %-20s %-10s %-15.2f %-10d %-15s %-10.2f%s%n",
+                    p.getId(), p.getName(), type, p.getDeliveryPrice(), p.getQuantity(),
+                    expirationDisplay, p.calculateSellingPrice(store), expired);
+        }
+
+    }
 }
