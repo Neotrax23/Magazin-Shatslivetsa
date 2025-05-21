@@ -204,4 +204,18 @@ public class StoreManagementSystem {
         store.addCashier(cashier);
         System.out.println("Cashier added successfully!");
     }
+    private static void viewCashiers() {
+        System.out.println("\n=== Cashiers ===");
+        List<Cashier> cashiers = store.getCashiers();
+
+        if (cashiers.isEmpty()) {
+            System.out.println("No cashiers available.");
+            return;
+        }
+
+        System.out.printf("%-5s %-20s %-15s%n", "ID", "Name", "Monthly Salary");
+        for (Cashier c : cashiers) {
+            System.out.printf("%-5d %-20s %-15.2f%n", c.getId(), c.getName(), c.getMonthlySalary());
+        }
+    }
 }
