@@ -1,9 +1,8 @@
 import java.io.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 
-public class StoreManagementSystem {
+public class Main {
     private static Store store;
     private static Scanner scanner = new Scanner(System.in);
 

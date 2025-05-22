@@ -1,5 +1,20 @@
-public class InsufficientQuantityException extends RuntimeException {
-    public InsufficientQuantityException(String message) {
-        super(message);
+public class InsufficientQuantityException extends Exception {
+    private Product product;
+    private int missingQuantity;
+
+    public InsufficientQuantityException(Product product, int missingQuantity) {
+        super("Insufficient quantity for product: " + product.getName() +
+                ". Missing: " + missingQuantity + " units.");
+        this.product = product;
+        this.missingQuantity = missingQuantity;
+    }
+
+    // Getters
+    public Product getProduct() {
+        return product;
+    }
+
+    public int getMissingQuantity() {
+        return missingQuantity;
     }
 }
