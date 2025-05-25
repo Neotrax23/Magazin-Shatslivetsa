@@ -1,49 +1,72 @@
 package Controller;
 
 import Model.*;
-
 import java.util.List;
 
 public class StoreController {
     private Store store;
-    public Store getStore() {
-        return this.store;
-    }
+    private ProductController productController;
+    private FoodProductController foodProductController;
+    private NonFoodProductController nonFoodProductController;
+    private CashierController cashierController;
+    private ReceiptController receiptController;
+
     public StoreController(Store store) {
         this.store = store;
+        this.productController = new ProductController(store);
+        this.foodProductController = new FoodProductController(store);
+        this.nonFoodProductController = new NonFoodProductController(store);
+        this.cashierController = new CashierController(store);
+        this.receiptController = new ReceiptController(store);
     }
 
+    // Product related methods
     public void addProduct(Product product) {
-        store.addProduct(product);
+        productController.addProduct(product);
     }
 
-    public List<Product> getProducts() {
-        return store.getInventory();
+    public List<Product> getAllProducts() {
+        return productController.getProducts();
     }
 
+    public Product getProductById(int id) {
+        return productController.getProductById(id);
+    }
+
+    // Cashier related methods
     public void addCashier(Cashier cashier) {
-        store.addCashier(cashier);
+        cashierController.addCashier(cashier);
     }
 
-    public List<Cashier> getCashiers() {
-        return store.getCashiers();
+    public List<Cashier> getAllCashiers() {
+        return cashierController.getCashiers();
     }
 
+    public Cashier getCashierById(int id) {
+        return cashierController.getCashierById(id);
+    }
+
+    // Receipt related methods
     public Receipt createReceipt(Cashier cashier) {
-        return store.createReceipt(cashier);
+        return receiptController.createReceipt(cashier);
     }
 
     public void addProductToReceipt(Receipt receipt, Product product, int quantity) throws InsufficientQuantityException {
-        receipt.addProduct(product, quantity, store);
+        receiptController.addProductToReceipt(receipt, product, quantity);
     }
 
+    // Store statistics methods
     public double calculateTotalRevenue() {
-        return Receipt.getTotalRevenue();
+        return receiptController.calculateTotalRevenue();
     }
 
     public double calculateTotalExpenses() {
-        double salaryExpenses = store.getCashiers().stream().mapToDouble(Cashier::getMonthlySalary).sum();
-        double deliveryExpenses = store.getInventory().stream().mapToDouble(p -> p.getDeliveryPrice() * p.getQuantity()).sum();
+        double salaryExpenses = cashierController.getCashiers().stream()
+                .mapToDouble(Cashier::getMonthlySalary)
+                .sum();
+        double deliveryExpenses = productController.getProducts().stream()
+                .mapToDouble(p -> p.getDeliveryPrice() * p.getQuantity())
+                .sum();
         return salaryExpenses + deliveryExpenses;
     }
 
@@ -51,7 +74,21 @@ public class StoreController {
         return calculateTotalRevenue() - calculateTotalExpenses();
     }
 
-    public int getTotalReceipts() {
-        return Receipt.getTotalReceipts();
+    public int getTotalReceiptsIssued() {
+        return receiptController.getTotalReceipts();
+    }
+
+    // Store configuration methods
+    public double getFoodMarkup() {
+        return store.getFoodMarkup();
+    }
+
+
+    public double getNonFoodMarkup() {
+        return store.getNonFoodMarkup();
+    }
+
+    public Store getStore() {
+        return store;
     }
 }

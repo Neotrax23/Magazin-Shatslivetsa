@@ -1,21 +1,29 @@
 package View;
 
-import Controller.StoreController;
+import Controller.*;
 import Model.*;
 import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 
 public class StoreView {
     private Scanner scanner;
     private StoreController controller;
+    private ProductView productView;
+    private FoodProductView foodProductView;
+    private NonFoodProductView nonFoodProductView;
+    private CashierView cashierView;
+    private ReceiptView receiptView;
 
-    public StoreView(StoreController controller) {
+    public StoreView(StoreController controller, ProductView productView, CashierView cashierView, ReceiptView receiptView, FoodProductView foodProductView, NonFoodProductView nonFoodProductView) {
         this.scanner = new Scanner(System.in);
         this.controller = controller;
+        this.productView = productView;
+        this.foodProductView = foodProductView;
+        this.nonFoodProductView = nonFoodProductView;
+        this.cashierView = cashierView;
+        this.receiptView = receiptView;
     }
 
     public void showMainMenu() {
@@ -51,7 +59,7 @@ public class StoreView {
 
             switch (choice) {
                 case 1: addProduct(); break;
-                case 2: viewProducts(); break;
+                case 2: productView.viewAllProducts(); break;
                 case 3: return;
                 default: System.out.println("Invalid option. Please try again.");
             }
@@ -76,7 +84,7 @@ public class StoreView {
 
         Product product;
         if (isFood.equals("y")) {
-            LocalDate expirationDate = getValidDateInput("Enter expiration date (YYYY-MM-DD): ");
+            LocalDate expirationDate = foodProductView.getExpirationDateInput();
             product = new FoodProduct(id, name, price, expirationDate, quantity);
         } else {
             product = new NonFoodProduct(id, name, price, LocalDate.now().plusYears(10), quantity);
@@ -84,29 +92,6 @@ public class StoreView {
 
         controller.addProduct(product);
         System.out.println("Product added successfully!");
-    }
-
-    private void viewProducts() {
-        System.out.println("\n=== Product Inventory ===");
-        List<Product> products = controller.getProducts();
-
-        if (products.isEmpty()) {
-            System.out.println("No products available.");
-            return;
-        }
-
-        System.out.printf("%-5s %-20s %-10s %-15s %-10s %-15s %-10s%n",
-                "ID", "Name", "Type", "Delivery Price", "Quantity", "Expiration", "Selling Price");
-
-        for (Product p : products) {
-            String type = (p instanceof FoodProduct) ? "Food" : "Non-Food";
-            String expirationDisplay = (p instanceof FoodProduct) ? p.getExpirationDate().toString() : "Non applicable";
-            String expired = (p instanceof FoodProduct && p.isExpired()) ? " (EXPIRED)" : "";
-
-            System.out.printf("%-5d %-20s %-10s %-15.2f %-10d %-15s %-10.2f%s%n",
-                    p.getId(), p.getName(), type, p.getDeliveryPrice(), p.getQuantity(),
-                    expirationDisplay, p.calculateSellingPrice(controller.getStore()), expired);
-        }
     }
 
     private void manageCashiers() {
@@ -120,7 +105,7 @@ public class StoreView {
 
             switch (choice) {
                 case 1: addCashier(); break;
-                case 2: viewCashiers(); break;
+                case 2: cashierView.viewAllCashiers(); break;
                 case 3: return;
                 default: System.out.println("Invalid option. Please try again.");
             }
@@ -129,7 +114,7 @@ public class StoreView {
 
     private void addCashier() {
         System.out.println("\n=== Add New Cashier ===");
-        int id = getValidIntInput("Enter cashier ID: ");
+        int id = cashierView.getCashierIdInput();
         System.out.print("Enter cashier name: ");
         String name = scanner.nextLine();
         double salary = getValidDoubleInput("Enter monthly salary: ");
@@ -139,24 +124,9 @@ public class StoreView {
         System.out.println("Cashier added successfully!");
     }
 
-    private void viewCashiers() {
-        System.out.println("\n=== Cashiers ===");
-        List<Cashier> cashiers = controller.getCashiers();
-
-        if (cashiers.isEmpty()) {
-            System.out.println("No cashiers available.");
-            return;
-        }
-
-        System.out.printf("%-5s %-20s %-15s%n", "ID", "Name", "Monthly Salary");
-        for (Cashier c : cashiers) {
-            System.out.printf("%-5d %-20s %-15.2f%n", c.getId(), c.getName(), c.getMonthlySalary());
-        }
-    }
-
     private void processSale() {
         System.out.println("\n=== Process Sale ===");
-        List<Cashier> cashiers = controller.getCashiers();
+        List<Cashier> cashiers = controller.getAllCashiers();
 
         if (cashiers.isEmpty()) {
             System.out.println("No cashiers available. Please add cashiers first.");
@@ -186,18 +156,11 @@ public class StoreView {
             int choice = getValidIntInput("Select option: ");
             if (choice == 2) break;
 
-            viewProducts();
-            int productId = getValidIntInput("Enter product ID to add: ");
+            productView.viewAllProducts();
+            int productId = productView.getProductIdInput();
             int quantity = getValidIntInput("Enter quantity: ");
 
-            Product selectedProduct = null;
-            for (Product p : controller.getProducts()) {
-                if (p.getId() == productId) {
-                    selectedProduct = p;
-                    break;
-                }
-            }
-
+            Product selectedProduct = controller.getProductById(productId);
             if (selectedProduct == null) {
                 System.out.println("Product not found!");
                 continue;
@@ -211,46 +174,8 @@ public class StoreView {
             }
         }
 
-        System.out.println("\n=== Receipt Summary ===");
-        System.out.println("Receipt #" + receipt.getReceiptNumber());
-        System.out.println("Cashier: " + receipt.getCashier().getName());
-        System.out.println("Date: " + receipt.getDateTime());
-
-        System.out.println("\nItems Purchased:");
-        System.out.printf("%-20s %-10s %-10s %-10s%n", "Product", "Price", "Qty", "Subtotal");
-        for (Map.Entry<Product, Integer> entry : receipt.getProducts().entrySet()) {
-            Product p = entry.getKey();
-            int qty = entry.getValue();
-            double price = p.calculateSellingPrice(controller.getStore());
-            System.out.printf("%-20s %-10.2f %-10d %-10.2f%n",
-                    p.getName(), price, qty, price * qty);
-        }
-
-        System.out.println("\nTotal Amount: $" + receipt.getTotalAmount());
-        saveReceiptToFile(receipt);
-    }
-
-    private void saveReceiptToFile(Receipt receipt) {
-        String filename = "receipt_" + receipt.getReceiptNumber() + ".txt";
-        try (PrintWriter writer = new PrintWriter(filename)) {
-            writer.println("=== Receipt ===");
-            writer.println("Number: " + receipt.getReceiptNumber());
-            writer.println("Cashier: " + receipt.getCashier().getName());
-            writer.println("Date: " + receipt.getDateTime());
-
-            writer.println("\nItems:");
-            for (Map.Entry<Product, Integer> entry : receipt.getProducts().entrySet()) {
-                Product p = entry.getKey();
-                int qty = entry.getValue();
-                double price = p.calculateSellingPrice(controller.getStore());
-                writer.printf("%s - %.2f x %d = %.2f%n", p.getName(), price, qty, price * qty);
-            }
-
-            writer.println("\nTotal: " + receipt.getTotalAmount());
-            System.out.println("Receipt saved to " + filename);
-        } catch (FileNotFoundException e) {
-            System.out.println("Error saving receipt: " + e.getMessage());
-        }
+        receiptView.printReceiptDetails(receipt);
+        receiptView.saveReceiptToFile(receipt);
     }
 
     private void viewStatistics() {
@@ -261,14 +186,14 @@ public class StoreView {
 
         System.out.println("\nInventory Value:");
         double totalInventoryValue = 0;
-        for (Product p : controller.getProducts()) {
+        for (Product p : controller.getAllProducts()) {
             double value = p.getDeliveryPrice() * p.getQuantity();
             System.out.printf("%s: $%.2f%n", p.getName(), value);
             totalInventoryValue += value;
         }
         System.out.printf("Total Inventory Value: $%.2f%n", totalInventoryValue);
 
-        System.out.println("\nTotal Receipts Issued: " + controller.getTotalReceipts());
+        System.out.println("\nTotal Receipts Issued: " + controller.getTotalReceiptsIssued());
     }
 
     private int getValidIntInput(String prompt) {
@@ -289,17 +214,6 @@ public class StoreView {
                 return Double.parseDouble(scanner.nextLine());
             } catch (NumberFormatException e) {
                 System.out.println("Invalid input. Please enter a number.");
-            }
-        }
-    }
-
-    private LocalDate getValidDateInput(String prompt) {
-        while (true) {
-            System.out.print(prompt);
-            try {
-                return LocalDate.parse(scanner.nextLine());
-            } catch (Exception e) {
-                System.out.println("Invalid date format. Please use YYYY-MM-DD format.");
             }
         }
     }
