@@ -11,5 +11,4 @@ public class InsufficientQuantityException extends Exception {
     }
 
     public Product getProduct() { return product; }
-    public int getMissingQuantity() { return missingQuantity; }
 }

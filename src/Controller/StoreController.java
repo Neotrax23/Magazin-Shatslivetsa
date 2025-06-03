@@ -20,7 +20,6 @@ public class StoreController {
         this.receiptController = new ReceiptController(store);
     }
 
-    // Product related methods
     public void addProduct(Product product) {
         productController.addProduct(product);
     }
@@ -33,7 +32,6 @@ public class StoreController {
         return productController.getProductById(id);
     }
 
-    // Cashier related methods
     public void addCashier(Cashier cashier) {
         cashierController.addCashier(cashier);
     }
@@ -46,7 +44,6 @@ public class StoreController {
         return cashierController.getCashierById(id);
     }
 
-    // Receipt related methods
     public Receipt createReceipt(Cashier cashier) {
         return receiptController.createReceipt(cashier);
     }
@@ -55,7 +52,6 @@ public class StoreController {
         receiptController.addProductToReceipt(receipt, product, quantity);
     }
 
-    // Store statistics methods
     public double calculateTotalRevenue() {
         return receiptController.calculateTotalRevenue();
     }
@@ -76,16 +72,6 @@ public class StoreController {
 
     public int getTotalReceiptsIssued() {
         return receiptController.getTotalReceipts();
-    }
-
-    // Store configuration methods
-    public double getFoodMarkup() {
-        return store.getFoodMarkup();
-    }
-
-
-    public double getNonFoodMarkup() {
-        return store.getNonFoodMarkup();
     }
 
     public Store getStore() {

@@ -1,7 +1,4 @@
 package Model;
-
-import Model.Product;
-
 import java.time.LocalDate;
 
 public class NonFoodProduct extends Product {

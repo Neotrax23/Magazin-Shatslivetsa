@@ -32,7 +32,6 @@ public class Receipt {
         product.setQuantity(product.getQuantity() - quantity);
     }
 
-    // Getters
     public static int getTotalReceipts() { return totalReceipts; }
     public static double getTotalRevenue() { return totalRevenue; }
     public int getReceiptNumber() { return receiptNumber; }

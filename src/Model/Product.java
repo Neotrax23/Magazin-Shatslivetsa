@@ -19,15 +19,10 @@ public abstract class Product {
 
     public abstract double calculateSellingPrice(Store store);
 
-    // Getters and setters
     public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
     public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
     public double getDeliveryPrice() { return deliveryPrice; }
-    public void setDeliveryPrice(double deliveryPrice) { this.deliveryPrice = deliveryPrice; }
     public LocalDate getExpirationDate() { return expirationDate; }
-    public void setExpirationDate(LocalDate expirationDate) { this.expirationDate = expirationDate; }
     public int getQuantity() { return quantity; }
     public void setQuantity(int quantity) { this.quantity = quantity; }
 

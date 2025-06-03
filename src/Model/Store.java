@@ -36,7 +36,6 @@ public class Store {
         return receipt;
     }
 
-    // Other methods and getters/setters remain the same
     public List<Product> getInventory() { return inventory; }
     public List<Cashier> getCashiers() { return cashiers; }
     public double getFoodMarkup() { return foodMarkup; }
